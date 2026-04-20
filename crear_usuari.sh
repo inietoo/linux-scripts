@@ -6,10 +6,23 @@ echo "--         Autor: Igor            --"
 echo "------------------------------------"
 
 read -p "Introdueix el nom del nou usuari: " USUARI
+read -p "Introdueix el grup al que pertany l'usuari: " GRUP
 
 # Comprovem que s'ha introduït un nom d'usuari
 if [ -z "$USUARI" ]; then
     echo "Error: No s'ha introduït cap nom d'usuari."
+    exit 1
+fi
+
+# Comprovem que s'ha introduït un grup
+if [ -z "$GRUP" ]; then
+    echo "Error: No s'ha introduït cap grup."
+    exit 1
+fi
+
+# Comprovem que el grup existeix
+if ! getent group "$GRUP" > /dev/null; then
+    echo "Error: El grup '$GRUP' no existeix."
     exit 1
 fi
 
@@ -20,7 +33,7 @@ if id "$USUARI" &>/dev/null; then
 fi
 
 # Creem l'usuari
-useradd -m -s /bin/bash "$USUARI"
+useradd -m -s /bin/bash -g "$GRUP" "$USUARI"
 if [ $? -ne 0 ]; then
     echo "Error: No s'ha pogut crear l'usuari '$USUARI'."
     exit 1
